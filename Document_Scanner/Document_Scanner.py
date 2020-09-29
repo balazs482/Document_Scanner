@@ -55,7 +55,6 @@ else:
         for corner in corners:
             cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
         cv2.imshow('Frame', originalImage)
-        cv2.imshow('meta', img)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
