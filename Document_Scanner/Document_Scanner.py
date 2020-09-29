@@ -1,3 +1,16 @@
+import numpy as np
+import cv2
+import itertools
+
+IMAGE_PATH = 'test samples/sample_1.jpg'
+BLUR_VALUE = 10
+CANNY_LOWTHRESHOLD = 40 # default is 100
+CANNY_HIGHTRESHOLD = 300 # default is 200
+THRESHOLD_VALUE = 127
+ELLIPSE_COEFFICIENT = 0.08
+CORNER_DISTANCE_RATIO = 3
+# get image with blur and canny
+originalImage = cv2.imread(IMAGE_PATH, -1)
 img =  cv2.Canny(cv2.GaussianBlur(originalImage, (5, 5), BLUR_VALUE), CANNY_LOWTHRESHOLD, CANNY_HIGHTRESHOLD)
 HEIGHT, WIDTH = img.shape
 
