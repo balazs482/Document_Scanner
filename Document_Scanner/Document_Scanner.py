@@ -9,6 +9,7 @@ CANNY_HIGHTRESHOLD = 300 # default is 200
 THRESHOLD_VALUE = 127
 ELLIPSE_COEFFICIENT = 0.08
 CORNER_DISTANCE_RATIO = 3
+
 # get image with blur and canny
 originalImage = cv2.imread(IMAGE_PATH, -1)
 img =  cv2.Canny(cv2.GaussianBlur(originalImage, (5, 5), BLUR_VALUE), CANNY_LOWTHRESHOLD, CANNY_HIGHTRESHOLD)
@@ -21,12 +22,12 @@ contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_S
 # contour approximation
 contours = sorted(contours, key = cv2.contourArea, reverse = True)
 for i in contours:
-	elip =  cv2.arcLength(i, True)
-	approx = cv2.approxPolyDP(i, ELLIPSE_COEFFICIENT * elip, True)
-
-	if len(approx) == 4: 
-		doc = approx 
-		break
+    elip =  cv2.arcLength(i, True)
+    approx = cv2.approxPolyDP(i, ELLIPSE_COEFFICIENT * elip, True)
+    if len(approx) == 4: 
+        doc = approx
+        break
+doc = doc.reshape((4,2))
 
 # checking if four corners are recognized and far apart
 if len(doc) != 4:
@@ -34,7 +35,7 @@ if len(doc) != 4:
     print('ERROR: Could not recognize 4 corners')
 else:
     # calculating minimum distance between points
-    minDistance = math.sqrt(HEIGHT ** 2 + WIDTH ** 2)
+    minDistance = min(HEIGHT, WIDTH)
     for pair in itertools.combinations(doc, r = 2):
         distance = np.linalg.norm(pair[0] - pair[1])
         if (distance < minDistance): 
@@ -43,10 +44,18 @@ else:
         #error
         print('ERROR: Corners are too close together')
     else:
+        # assign corners
+        upperCorners, lowerCorners = np.array_split(doc[np.argsort(doc[:, 0])], 2)
+        upperCorners[np.argsort(upperCorners[:, 1])]
+        lowerCorners[np.argsort(lowerCorners[:, 1])]
+        corners = dict(zip(['UL', 'UR', 'BL', 'BR'], np.append(upperCorners, lowerCorners, axis = 0)))
+
         # plot image
         cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
-	cv2.imshow('Prepared image', img)
-        cv2.imshow('Recognized sheet', originalImage)
+        for corner in corners:
+            cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+        cv2.imshow('Frame', originalImage)
+        cv2.imshow('meta', img)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
