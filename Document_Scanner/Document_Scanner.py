@@ -45,8 +45,8 @@ else:
     else:
         # plot image
         cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
-        cv2.imshow('Frame', originalImage)
-        cv2.imshow('meta', img)
+	cv2.imshow('Prepared image', img)
+        cv2.imshow('Recognized sheet', originalImage)
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
