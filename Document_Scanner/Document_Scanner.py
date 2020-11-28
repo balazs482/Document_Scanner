@@ -45,10 +45,10 @@ else:
         print('ERROR: Corners are too close together')
     else:
         # assign corners
-        upperCorners, lowerCorners = np.array_split(doc[np.argsort(doc[:, 1])], 2)     
-        upperCorners = upperCorners[np.argsort(upperCorners[:, 0])]
-        lowerCorners = lowerCorners[np.argsort(lowerCorners[:, 0])]
-        corners = {'TL' : upperCorners[0], 'TR' : upperCorners[1], 'BL' : lowerCorners[0], 'BR' : lowerCorners[1]}
+        topCorners, bottomCorners = np.array_split(doc[np.argsort(doc[:, 1])], 2)     
+        topCorners = topCorners[np.argsort(topCorners[:, 0])]
+        bottomCorners = bottomCorners[np.argsort(bottomCorners[:, 0])]
+        corners = {'TL' : topCorners[0], 'TR' : topCorners[1], 'BL' : bottomCorners[0], 'BR' : bottomCorners[1]}
 
         # plot image
         cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
