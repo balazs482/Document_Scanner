@@ -54,7 +54,7 @@ else:
         cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
         for corner in corners:
             cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
-        cv2.imshow('Frame', cv2.resize(originalImage, (round(HEIGHT / 2), round(WIDTH / 2))))
+        cv2.imshow('Frame', cv2.resize(originalImage, (0, 0), fx = 0.5, fy = 0.5))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
