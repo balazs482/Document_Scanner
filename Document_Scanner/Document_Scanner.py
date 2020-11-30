@@ -31,10 +31,10 @@ for i in contours:
 doc = doc.reshape((4,2))
 
 # checking if four corners are recognized and far apart
-if len(doc) == 0:
-    print('No need for transformation')
+if len(doc) != 4:
+    print('ERROR: Incorrect number of corners detected.')
 
-elif len(doc) == 4:
+else:
     # calculating minimum distance between points
     minDistance = min(HEIGHT, WIDTH)
     for pair in itertools.combinations(doc, r = 2):
@@ -68,10 +68,6 @@ elif len(doc) == 4:
 
         # plotting image
         cv2.imshow('Frame', cv2.resize(img, (0, 0), fx = PLOTTING_RATIO, fy = PLOTTING_RATIO))
-
-else:
-    # error
-    print('ERROR: Incorrect number of corners recognized')
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
