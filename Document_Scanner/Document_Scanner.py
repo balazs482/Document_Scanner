@@ -30,10 +30,14 @@ for i in contours:
 doc = doc.reshape((4,2))
 
 # checking if four corners are recognized and far apart
-if len(doc) != 4:
-    # error
-    print('ERROR: Could not recognize 4 corners')
-else:
+if len(doc) == 0:
+    # assign corners
+    topCorners[0] = [0, 0]
+    topCorners[1] = [WIDTH, 0]
+    bottomCorners[0] = [0, HEIGHT]
+    bottomCorners[1] = [WIDTH, HEIGHT]
+
+elif len(doc) == 4:
     # calculating minimum distance between points
     minDistance = min(HEIGHT, WIDTH)
     for pair in itertools.combinations(doc, r = 2):
@@ -41,20 +45,24 @@ else:
         if (distance < minDistance): 
             minDistance = distance
     if minDistance < HEIGHT / CORNER_DISTANCE_RATIO:
-        #error
+        # error
         print('ERROR: Corners are too close together')
     else:
         # assign corners
         topCorners, bottomCorners = np.array_split(doc[np.argsort(doc[:, 1])], 2)     
         topCorners = topCorners[np.argsort(topCorners[:, 0])]
         bottomCorners = bottomCorners[np.argsort(bottomCorners[:, 0])]
-        corners = {'TL' : topCorners[0], 'TR' : topCorners[1], 'BL' : bottomCorners[0], 'BR' : bottomCorners[1]}
 
-        # plot image
-        cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
-        for corner in corners:
-            cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
-        cv2.imshow('Frame', cv2.resize(originalImage, (0, 0), fx = 0.5, fy = 0.5))
+else:
+    # error
+    print('ERROR: Incorrect number of corners recognized')
+
+# plot image
+corners = {'TL' : topCorners[0], 'TR' : topCorners[1], 'BL' : bottomCorners[0], 'BR' : bottomCorners[1]}
+cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
+for corner in corners:
+    cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
+cv2.imshow('Frame', cv2.resize(originalImage, (0, 0), fx = 0.5, fy = 0.5))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
