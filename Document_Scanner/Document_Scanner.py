@@ -9,6 +9,7 @@ CANNY_HIGHTRESHOLD = 300 # default is 200
 THRESHOLD_VALUE = 127
 ELLIPSE_COEFFICIENT = 0.08
 CORNER_DISTANCE_RATIO = 3
+PLOTTING_RATIO = 0.6
 
 # get image with blur and canny
 originalImage = cv2.imread(IMAGE_PATH, -1)
@@ -31,11 +32,7 @@ doc = doc.reshape((4,2))
 
 # checking if four corners are recognized and far apart
 if len(doc) == 0:
-    # assign corners
-    topCorners[0] = [0, 0]
-    topCorners[1] = [WIDTH, 0]
-    bottomCorners[0] = [0, HEIGHT]
-    bottomCorners[1] = [WIDTH, HEIGHT]
+    print('No need for transformation')
 
 elif len(doc) == 4:
     # calculating minimum distance between points
@@ -52,17 +49,29 @@ elif len(doc) == 4:
         topCorners, bottomCorners = np.array_split(doc[np.argsort(doc[:, 1])], 2)     
         topCorners = topCorners[np.argsort(topCorners[:, 0])]
         bottomCorners = bottomCorners[np.argsort(bottomCorners[:, 0])]
+        # getting larger vertical and horizontal distances
+        def dist(p1, p2): return ((p1[0] - p2[0])**2 + (p1[1] - p2[1])**2)**0.5
+        maxWidth = max(int(dist(topCorners[0], topCorners[1])), int(dist(bottomCorners[0], bottomCorners[1])))
+        maxHeight = max(int(dist(topCorners[0], bottomCorners[0])), int(dist(topCorners[1], bottomCorners[1])))
+
+        # creating destination array
+        destinationPoints = np.array([
+        [0, 0],
+        [maxWidth - 1, 0],
+        [0, maxHeight - 1],
+        [maxWidth - 1, maxHeight - 1]
+        ], dtype = "float32")
+
+        # transform with matrix
+        corners = np.array(np.concatenate((topCorners, bottomCorners), axis = 0), np.float32)
+        img = cv2.warpPerspective(originalImage, cv2.getPerspectiveTransform(corners, destinationPoints), (maxWidth, maxHeight))
+
+        # plotting image
+        cv2.imshow('Frame', cv2.resize(img, (0, 0), fx = PLOTTING_RATIO, fy = PLOTTING_RATIO))
 
 else:
     # error
     print('ERROR: Incorrect number of corners recognized')
-
-# plot image
-corners = {'TL' : topCorners[0], 'TR' : topCorners[1], 'BL' : bottomCorners[0], 'BR' : bottomCorners[1]}
-cv2.drawContours(originalImage, [doc], -1, (0, 255, 0), 3)
-for corner in corners:
-    cv2.putText(originalImage, corner, tuple(corners[corner]), cv2.FONT_HERSHEY_SIMPLEX, 1.5, (255, 0, 0), 2)
-cv2.imshow('Frame', cv2.resize(originalImage, (0, 0), fx = 0.5, fy = 0.5))
 
 cv2.waitKey(0)
 cv2.destroyAllWindows()
